@@ -360,7 +360,7 @@ public class NCMBInstallation extends NCMBObject {
      *
      * @return Installation
      */
-    public static NCMBInstallation getCurrentInstallation() {
+    public static NCMBInstallation getCurrentInstallation() throws NCMBException {
         try {
             //null check
             NCMBLocalFile.checkNCMBContext();
@@ -378,7 +378,7 @@ public class NCMBInstallation extends NCMBObject {
                 }
             }
         } catch (Exception error) {
-            throw new RuntimeException(error);
+            throw new NCMBException(error);
         }
         return currentInstallation;
     }
@@ -419,7 +419,10 @@ public class NCMBInstallation extends NCMBObject {
     public void getRegistrationIdInBackground(String senderId, final DoneCallback callback) {
         //Nullチェック
         if (senderId == null && NCMB.getCurrentContext().context == null) {
-            throw new RuntimeException("applicationContext or senderId is must not be null.");
+            if (callback != null) {
+                callback.done(new NCMBException(NCMBException.REQUIRED, "applicationContext or senderId is must not be null."));
+                return;
+            }
         }
 
         //端末にAPKがインストールされていない場合は処理を終了
@@ -502,8 +505,12 @@ public class NCMBInstallation extends NCMBObject {
         }
 
         //端末未登録の場合は処理を実行しない
-        if (NCMBInstallation.getCurrentInstallation().getObjectId() == null) {
-            return;
+        try {
+            if (NCMBInstallation.getCurrentInstallation().getObjectId() == null) {
+                return;
+            }
+        } catch (NCMBException e) {
+            throw new RuntimeException(e);
         }
 
         // NCMB/channels フォルダの取得
@@ -524,7 +531,11 @@ public class NCMBInstallation extends NCMBObject {
 
         // NCMB/channels/channelName 作成
         File writeFile = new File(channelDir, channelName);
-        NCMBLocalFile.writeFile(writeFile, localData);
+        try {
+            NCMBLocalFile.writeFile(writeFile, localData);
+        } catch (NCMBException e) {
+            throw new RuntimeException();
+        }
     }
 
     /**
@@ -539,8 +550,12 @@ public class NCMBInstallation extends NCMBObject {
         }
 
         //端末未登録の場合は処理を実行しない
-        if (NCMBInstallation.getCurrentInstallation().getObjectId() == null) {
-            return;
+        try {
+            if (NCMBInstallation.getCurrentInstallation().getObjectId() == null) {
+                return;
+            }
+        } catch (NCMBException e) {
+            throw new RuntimeException(e);
         }
 
         // NCMB/channels フォルダの取得
