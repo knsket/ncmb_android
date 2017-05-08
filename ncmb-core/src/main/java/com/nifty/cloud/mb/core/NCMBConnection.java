@@ -144,7 +144,7 @@ public class NCMBConnection {
                         if (e.getMessage().equals("No authentication challenges found")) {
                             NCMBUserService.clearCurrentUser();
                         }
-                        throw new NCMBException(NCMBException.GENERIC_ERROR, e.getMessage());
+                        throw new NCMBException(NCMBException.AUTH_FAILURE, e.getMessage());
                     } finally {
                         //Disconnect HTTPURLConnection
                         if (urlConnection != null) {
@@ -165,7 +165,7 @@ public class NCMBConnection {
             }
             return res;
         } catch (InterruptedException | ExecutionException | TimeoutException e) {
-            throw new NCMBException(NCMBException.GENERIC_ERROR, e.getMessage());
+            throw new NCMBException(e);
         }
     }
 
